@@ -1,5 +1,5 @@
 {
-  "name": "my-turborepo",
+  "name": "whatsapp_pa",
   "private": true,
   "scripts": {
     "build": "turbo run build",
