@@ -8,6 +8,8 @@ import {WhatsAppService} from '../whatsapp/service'
 
 export const config = {
   runtime: 'edge',
+  // Add Vercel environment variables to be available in Edge
+  env: ['WHATSAPP_TOKEN', 'WHATSAPP_PHONE_NUMBER_ID', 'WHATSAPP_VERIFY_TOKEN'],
 }
 
 // Remove dotenv config call
