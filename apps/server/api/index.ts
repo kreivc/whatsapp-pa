@@ -1,15 +1,17 @@
 import {Hono} from 'hono'
 import {handle} from 'hono/vercel'
 import {WhatsAppService} from '../whatsapp/service'
-import {config as dotenvConfig} from 'dotenv'
-import {mastra} from '@repo/mastra'
+// Remove dotenv import which uses Node.js modules not available in Edge
+// import {config as dotenvConfig} from 'dotenv'
+// import {mastra} from '@repo/mastra'
 // import {insertCredential, insertExpense, insertLink, insertReminder} from '@repo/database'
 
 export const config = {
   runtime: 'edge',
 }
 
-dotenvConfig()
+// Remove dotenv config call
+// dotenvConfig()
 
 const app = new Hono()
 
@@ -54,70 +56,85 @@ app.post('/whatsapp_response', async c => {
           await whatsappService.downloadMedia(message.image.id)
         }
       } else {
-        const personalAssistant = mastra.getAgent('whatsappPersonalAssistant')
-        const response = await personalAssistant.generate([
-          {
-            role: 'user',
-            content: message.text?.body || '',
-          },
-        ])
+        // Simple fallback response when mastra is not available in Edge
+        content = `I received your message: "${message.text?.body || ''}". I'm currently running in Edge mode with limited capabilities.`
 
-        const tool = response.response.messages.filter((m: {role: string}) => m.role === 'tool')
-        let toolName = ''
-        let result = {}
-        if (tool && tool.length > 0) {
-          const toolCall = tool[0].content[0] as {toolName: string; result: Record<string, unknown>}
-          toolName = toolCall.toolName
-          result = toolCall.result
+        // For development environment only - Mastra functionality
+        if (process.env.NODE_ENV === 'development') {
+          try {
+            // Dynamic import to avoid Edge Function issues
+            const {mastra} = await import('@repo/mastra')
+            const personalAssistant = mastra.getAgent('whatsappPersonalAssistant')
+            const response = await personalAssistant.generate([
+              {
+                role: 'user',
+                content: message.text?.body || '',
+              },
+            ])
+
+            const tool = response.response.messages.filter((m: {role: string}) => m.role === 'tool')
+            let toolName = ''
+            let result = {}
+            if (tool && tool.length > 0) {
+              const toolCall = tool[0].content[0] as {
+                toolName: string
+                result: Record<string, unknown>
+              }
+              toolName = toolCall.toolName
+              result = toolCall.result
+            }
+
+            switch (toolName) {
+              case 'expenseTrackerTool':
+                const expenseData = result as {name: string; amount: number}
+                const expenseName = expenseData.name
+                const expenseAmount = expenseData.amount
+                // await insertExpense(expenseName, expenseAmount)
+                result = {
+                  name: expenseName,
+                  amount: expenseAmount,
+                }
+                break
+              case 'linkTool':
+                const linkData = result as {name: string; url: string}
+                const linkName = linkData.name
+                const linkUrl = linkData.url
+                // await insertLink(linkName, linkUrl)
+                result = {
+                  name: linkName,
+                  url: linkUrl,
+                }
+                break
+              case 'reminderTool':
+                const reminderData = result as {event: string; date: string}
+                const reminderEvent = reminderData.event
+                const reminderDate = reminderData.date
+                // await insertReminder(reminderEvent, reminderDate)
+                result = {
+                  event: reminderEvent,
+                  date: reminderDate,
+                }
+                break
+              case 'credentialTool':
+                const credentialData = result as {name: string; credentials: string}
+                const credentialName = credentialData.name
+                const credentialCredentials = credentialData.credentials
+                // await insertCredential(credentialName, credentialCredentials)
+                result = {
+                  name: credentialName,
+                  credentials: credentialCredentials,
+                }
+                break
+              default:
+                break
+            }
+            console.log('TRACE TOOL', result)
+
+            content = JSON.stringify(result)
+          } catch (err) {
+            console.error('Mastra import error:', err)
+          }
         }
-
-        switch (toolName) {
-          case 'expenseTrackerTool':
-            const expenseData = result as {name: string; amount: number}
-            const expenseName = expenseData.name
-            const expenseAmount = expenseData.amount
-            // await insertExpense(expenseName, expenseAmount)
-            result = {
-              name: expenseName,
-              amount: expenseAmount,
-            }
-            break
-          case 'linkTool':
-            const linkData = result as {name: string; url: string}
-            const linkName = linkData.name
-            const linkUrl = linkData.url
-            // await insertLink(linkName, linkUrl)
-            result = {
-              name: linkName,
-              url: linkUrl,
-            }
-            break
-          case 'reminderTool':
-            const reminderData = result as {event: string; date: string}
-            const reminderEvent = reminderData.event
-            const reminderDate = reminderData.date
-            // await insertReminder(reminderEvent, reminderDate)
-            result = {
-              event: reminderEvent,
-              date: reminderDate,
-            }
-            break
-          case 'credentialTool':
-            const credentialData = result as {name: string; credentials: string}
-            const credentialName = credentialData.name
-            const credentialCredentials = credentialData.credentials
-            // await insertCredential(credentialName, credentialCredentials)
-            result = {
-              name: credentialName,
-              credentials: credentialCredentials,
-            }
-            break
-          default:
-            break
-        }
-        console.log('TRACE TOOL', result)
-
-        content = JSON.stringify(result)
       }
       const responseText = content
       await whatsappService.sendResponse(fromNumber, responseText)
