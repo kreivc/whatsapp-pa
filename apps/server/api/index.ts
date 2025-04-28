@@ -1,5 +1,5 @@
 import {Hono} from 'hono'
-import {serve} from '@hono/node-server'
+import {handle} from 'hono/vercel'
 import {WhatsAppService} from '../whatsapp/service'
 import {config as dotenvConfig} from 'dotenv'
 import {mastra} from '@repo/mastra'
@@ -137,7 +137,4 @@ const PORT = 3002
 
 console.log(`HONO Server running on port ${PORT}`)
 
-serve({
-  fetch: app.fetch,
-  port: PORT,
-})
+handle(app)
