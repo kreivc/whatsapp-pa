@@ -62,13 +62,13 @@ app.post('/whatsapp_response', async c => {
           },
         ])
 
-        const tool = response.response.messages.filter(m => m.role === 'tool')
+        const tool = response.response.messages.filter((m: {role: string}) => m.role === 'tool')
         let toolName = ''
         let result = {}
         if (tool && tool.length > 0) {
-          const toolCall = tool[0].content[0]
+          const toolCall = tool[0].content[0] as {toolName: string; result: Record<string, unknown>}
           toolName = toolCall.toolName
-          result = toolCall.result as Record<string, unknown>
+          result = toolCall.result
         }
 
         switch (toolName) {
