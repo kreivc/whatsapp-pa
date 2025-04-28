@@ -11,15 +11,16 @@
     "build": "tsc && tsc-alias"
   },
   "dependencies": {
+    "@hono/node-server": "^1.14.1",
     "@repo/database": "workspace:*",
     "@repo/mastra": "workspace:*",
-    "@hono/node-server": "^1.14.1",
     "dotenv": "^16.5.0",
     "hono": "^4.7.8"
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.14.0",
+    "tsc-alias": "^1.8.15",
     "tsx": "^4.19.1",
     "typescript": "5.8.2"
   }
