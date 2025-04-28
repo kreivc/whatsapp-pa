@@ -1,0 +1,106 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ExpenseTracker {
+  id        String   @id @default(uuid())
+  name      String
+  amount    Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Tags Tag[]
+
+  @@map("expense_tracker")
+}
+
+model Notes {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Tags Tag[]
+
+  @@map("notes")
+}
+
+model Reminders {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  Tags Tag[]
+
+  @@map("reminders")
+}
+
+model Image {
+  id          String   @id @default(uuid())
+  key         String
+  reference   String
+  description String?
+  summary     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  Tags Tag[]
+
+  @@map("images")
+}
+
+model Link {
+  id          String   @id @default(uuid())
+  url         String
+  description String?
+  summary     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  Tags Tag[]
+
+  @@map("links")
+}
+
+model Credentials {
+  id        String   @id @default(uuid())
+  name      String
+  secret    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Tags Tag[]
+
+  @@map("credentials")
+}
+
+model Tag {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Notes          Notes[]
+  Reminders      Reminders[]
+  Images         Image[]
+  Links          Link[]
+  Credentials    Credentials[]
+  ExpenseTracker ExpenseTracker[]
+
+  @@map("tags")
+}

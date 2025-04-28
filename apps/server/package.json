@@ -1,0 +1,26 @@
+{
+  "name": "server",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch api/index.ts",
+    "start": "node ./dist/api/index.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "npm run lint --fix",
+    "test": "cross-env NODE_ENV=test vitest",
+    "build": "tsc && tsc-alias"
+  },
+  "dependencies": {
+    "@repo/database": "workspace:*",
+    "@repo/mastra": "workspace:*",
+    "@hono/node-server": "^1.14.1",
+    "dotenv": "^16.5.0",
+    "hono": "^4.7.8"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^22.14.0",
+    "tsx": "^4.19.1",
+    "typescript": "5.8.2"
+  }
+}

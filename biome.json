@@ -1,0 +1,97 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "ignore": [
+      "**/.next"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 100,
+    "attributePosition": "auto",
+    "ignore": [
+      "**/node_modules",
+      "**/.browserslistrc",
+      "**/.env",
+      "**/.env.sample",
+      "**/.eslintignore",
+      "**/.gitignore",
+      "**/.npmrc",
+      "**/.gitlab-ci.yml",
+      "**/*variables.scss",
+      "src/services/openapi/v1.0",
+      "**/.next",
+      "**/dist"
+    ]
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "correctness": {
+        "useExhaustiveDependencies": "off"
+      },
+      "nursery": {
+        "useSortedClasses": {
+          "fix": "safe",
+          "options": {
+            "attributes": [
+              "classList"
+            ],
+            "functions": [
+              "clsx",
+              "cva",
+              "tw"
+            ]
+          },
+          "level": "warn"
+        }
+      },
+      "a11y": {
+        "useKeyWithClickEvents": "off"
+      },
+      "recommended": false,
+      "style": {
+        "useBlockStatements": {
+          "fix": "safe",
+          "level": "warn"
+        },
+        "useImportType": {
+          "fix": "safe",
+          "level": "error"
+        }
+      }
+    },
+    "ignore": [
+      "**/.next"
+    ]
+  },
+  "javascript": {
+    "formatter": {
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "es5",
+      "semicolons": "asNeeded",
+      "arrowParentheses": "asNeeded",
+      "bracketSameLine": false,
+      "quoteStyle": "single",
+      "attributePosition": "auto",
+      "bracketSpacing": false
+    },
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
+    }
+  }
+}
