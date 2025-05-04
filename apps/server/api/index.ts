@@ -3,7 +3,7 @@ import {serve} from '@hono/node-server'
 import {WhatsAppService} from '../whatsapp/service'
 import {config as dotenvConfig} from 'dotenv'
 import {mastra} from '@repo/mastra'
-// import {insertCredential, insertExpense, insertLink, insertReminder} from '@repo/database'
+import {insertCredential, insertExpense, insertLink, insertReminder} from '@repo/database'
 
 dotenvConfig()
 
@@ -26,9 +26,12 @@ const whatsappService = new WhatsAppService()
 
 app.get('/whatsapp_response', c => {
   const url = new URL(c.req.url)
+  console.log('TRACE VERIFY WEBHOOK', url.searchParams.get('hub.verify_token'))
   if (whatsappService.verifyWebhook(url.searchParams.get('hub.verify_token') || '')) {
+    console.log('TRACE VERIFY WEBHOOK', url.searchParams.get('hub.challenge'))
     return c.text(url.searchParams.get('hub.challenge') || '', 200)
   }
+  console.log('TRACE VERIFY WEBHOOK', 'Verification token mismatch')
   return c.text('Verification token mismatch', 403)
 })
 
@@ -72,7 +75,7 @@ app.post('/whatsapp_response', async c => {
             const expenseData = result as {name: string; amount: number}
             const expenseName = expenseData.name
             const expenseAmount = expenseData.amount
-            // await insertExpense(expenseName, expenseAmount)
+            await insertExpense(expenseName, expenseAmount)
             result = {
               name: expenseName,
               amount: expenseAmount,
@@ -82,7 +85,7 @@ app.post('/whatsapp_response', async c => {
             const linkData = result as {name: string; url: string}
             const linkName = linkData.name
             const linkUrl = linkData.url
-            // await insertLink(linkName, linkUrl)
+            await insertLink(linkName, linkUrl)
             result = {
               name: linkName,
               url: linkUrl,
@@ -92,7 +95,7 @@ app.post('/whatsapp_response', async c => {
             const reminderData = result as {event: string; date: string}
             const reminderEvent = reminderData.event
             const reminderDate = reminderData.date
-            // await insertReminder(reminderEvent, reminderDate)
+            await insertReminder(reminderEvent, reminderDate)
             result = {
               event: reminderEvent,
               date: reminderDate,
@@ -102,7 +105,7 @@ app.post('/whatsapp_response', async c => {
             const credentialData = result as {name: string; credentials: string}
             const credentialName = credentialData.name
             const credentialCredentials = credentialData.credentials
-            // await insertCredential(credentialName, credentialCredentials)
+            await insertCredential(credentialName, credentialCredentials)
             result = {
               name: credentialName,
               credentials: credentialCredentials,
