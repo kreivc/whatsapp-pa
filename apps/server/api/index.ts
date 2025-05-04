@@ -24,6 +24,10 @@ const whatsappService = new WhatsAppService()
 
 // --- Routes ---
 
+app.get('/', c => {
+  return c.text('Hello World', 200)
+})
+
 app.get('/whatsapp_response', c => {
   const url = new URL(c.req.url)
   console.log('TRACE VERIFY WEBHOOK', url.searchParams.get('hub.verify_token'))
